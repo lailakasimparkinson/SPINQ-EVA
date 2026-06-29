@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpinQ Technology — Educational Venture Analysis</title>
+<style>
+  :root {
+    --navy:     #0A1628;
+    --navy2:    #0D2240;
+    --navy3:    #112D5A;
+    --blue:     #1A4DB5;
+    --teal:     #00C2D4;
+    --teal2:    #0D9488;
+    --gold:     #F5A623;
+    --amber:    #F59E0B;
+    --red:      #DC2626;
+    --green:    #16A34A;
+    --white:    #FFFFFF;
+    --offwhite: #E8F0FE;
+    --slate:    #94A3B8;
+    --card:     #132244;
+    --card2:    #0F1F3D;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--offwhite);
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── SIDE NAV ── */
+  #sidenav {
+    position: fixed; left: 1.2rem; top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex; flex-direction: column; gap: 0.55rem;
+  }
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--slate); cursor: pointer;
+    transition: all 0.3s; position: relative;
+  }
+  .nav-dot:hover, .nav-dot.active { background: var(--teal); transform: scale(1.5); }
+  .nav-dot .nav-label {
+    position: absolute; left: 1.4rem; top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap; font-size: 0.68rem;
+    color: var(--teal); opacity: 0; pointer-events: none;
+    transition: opacity 0.2s; letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .nav-dot:hover .nav-label { opacity: 1; }
+
+  /* ── VERDICT BADGE ── */
+  #verdict-badge {
+    position: fixed; top: 1rem; right: 1.5rem;
+    z-index: 100; background: var(--card);
+    border: 1px solid var(--blue); border-radius: 0.5rem;
+    padding: 0.45rem 0.9rem; text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  #verdict-badge .badge-label { font-size: 0.58rem; letter-spacing: 0.15em; color: var(--slate); text-transform: uppercase; display: block; margin-bottom: 0.1rem; }
+  #verdict-badge .badge-verdict { font-family: Georgia, serif; font-size: 0.82rem; font-weight: bold; color: var(--gold); display: block; line-height: 1.2; }
+  #verdict-badge .badge-sub { font-size: 0.58rem; color: var(--slate); display: block; margin-top: 0.1rem; }
+
+  /* ── SECTIONS ── */
+  section {
+    min-height: 100vh; padding: 5rem 5rem 5rem 4rem;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative;
+  }
+  section::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 4rem; right: 4rem; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue) 20%, var(--teal) 50%, var(--blue) 80%, transparent);
+    transform: scaleX(0); transition: transform 1s ease;
+  }
+  section.visible::after { transform: scaleX(1); }
+  .section-eyebrow {
+    font-size: 0.68rem; letter-spacing: 0.2em;
+    color: var(--teal); text-transform: uppercase;
+    margin-bottom: 0.6rem; font-family: monospace;
+  }
+  h1, h2, h3 { font-family: Georgia, serif; }
+  h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); color: var(--white); margin-bottom: 0.4rem; line-height: 1.2; }
+  h3 { font-size: 1rem; color: var(--teal); margin-bottom: 0.4rem; }
+  .lead { font-size: 1rem; color: var(--slate); max-width: 60ch; margin-bottom: 1.5rem; }
+
+  /* ── CITATION BADGE ── */
+  .cite {
+    display: inline-block;
+    font-size: 0.62rem; font-family: monospace;
+    background: rgba(0,194,212,0.12);
+    border: 1px solid rgba(0,194,212,0.3);
+    color: var(--teal); border-radius: 0.2rem;
+    padding: 0.05rem 0.35rem; vertical-align: middle;
+    margin-left: 0.2rem; cursor: default;
+    position: relative; white-space: nowrap;
+  }
+  .cite:hover::after {
+    content: attr(data-source);
+    position: absolute; bottom: 110%; left: 50%;
+    transform: translateX(-50%);
+    background: var(--card); border: 1px solid var(--blue);
+    color: var(--offwhite); font-size: 0.7rem; font-family: system-ui, sans-serif;
+    padding: 0.4rem 0.6rem; border-radius: 0.3rem;
+    white-space: nowrap; z-index: 200; pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card); border-radius: 0.75rem;
+    padding: 1.2rem 1.4rem;
+    border: 1px solid rgba(26,77,181,0.3);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .card:hover { border-color: var(--teal); transform: translateY(-2px); }
+
+  /* ── HERO ── */
+  #hero {
+    background: var(--navy); min-height: 100vh;
+    display: flex; align-items: center; justify-content: flex-start;
+    padding: 0 5rem 0 4rem; position: relative; overflow: hidden;
+  }
+  #hero::after { display: none; }
+  .orbit-container {
+    position: absolute; right: 6%; top: 50%;
+    transform: translateY(-50%);
+    width: 340px; height: 340px; pointer-events: none;
+  }
+  .orbit {
+    position: absolute; border-radius: 50%; border: 1px solid;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+  .orbit-1 { width: 300px; height: 300px; border-color: rgba(26,77,181,0.4); animation: spin1 12s linear infinite; }
+  .orbit-2 { width: 200px; height: 200px; border-color: rgba(0,194,212,0.3); animation: spin2 8s linear infinite reverse; }
+  .orbit-3 { width: 110px; height: 110px; border-color: rgba(245,166,35,0.3); animation: spin3 5s linear infinite; }
+  .nucleus {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 18px; height: 18px; border-radius: 50%;
+    background: radial-gradient(circle, var(--teal), var(--blue));
+    box-shadow: 0 0 20px var(--teal), 0 0 40px rgba(0,194,212,0.3);
+  }
+  .electron { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 8px var(--teal); top: -3.5px; left: 50%; transform: translateX(-50%); }
+  .electron-gold { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  @keyframes spin1 { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+  @keyframes spin2 { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+  @keyframes spin3 { from { transform: translate(-50%,-50%) rotate(30deg); } to { transform: translate(-50%,-50%) rotate(390deg); } }
+  .hero-content { max-width: 600px; z-index: 1; }
+  .hero-eyebrow { font-family: monospace; font-size: 0.72rem; letter-spacing: 0.2em; color: var(--teal); text-transform: uppercase; margin-bottom: 0.8rem; }
+  h1 { font-size: clamp(2.6rem, 4.5vw, 4rem); line-height: 1.05; color: var(--white); margin-bottom: 0.8rem; }
+  h1 span { color: var(--teal); }
+  .hero-sub { font-size: 1.05rem; color: var(--slate); margin-bottom: 1.5rem; font-style: italic; max-width: 52ch; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 1.2rem; margin-bottom: 2rem; }
+  .hero-meta-item .meta-label { color: var(--gold); font-weight: bold; display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .hero-meta-item .meta-val { color: var(--offwhite); font-size: 0.82rem; }
+
+  /* ── QUICK STATS TABLE ── */
+  .quick-stats {
+    background: var(--card2); border-radius: 0.75rem;
+    border: 1px solid rgba(26,77,181,0.4);
+    overflow: hidden; margin-bottom: 1.5rem;
+  }
+  .qs-header {
+    background: var(--blue); padding: 0.5rem 1rem;
+    font-size: 0.7rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--white); font-weight: 600;
+  }
+  .qs-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid rgba(26,77,181,0.2);
+  }
+  .qs-row:last-child { border-bottom: none; }
+  .qs-cell { padding: 0.6rem 1rem; font-size: 0.82rem; }
+  .qs-cell.label { color: var(--slate); font-size: 0.75rem; }
+  .qs-cell.value { color: var(--offwhite); font-weight: 600; }
+  .qs-cell.source-col { color: var(--teal); font-size: 0.72rem; font-family: monospace; }
+  .qs-verdict { color: var(--gold) !important; }
+
+  .scroll-cta {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; color: var(--teal); text-decoration: none;
+    letter-spacing: 0.1em; text-transform: uppercase; font-family: monospace;
+    transition: gap 0.3s;
+  }
+  .scroll-cta:hover { gap: 0.9rem; }
+  .scroll-cta .arrow { animation: bounce 1.8s infinite; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+
+  /* ── STAT TILES ── */
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-tile { background: var(--card); border-radius: 0.75rem; padding: 1.1rem; text-align: center; border: 1px solid rgba(26,77,181,0.3); }
+  .stat-tile .stat-val { font-family: monospace; font-size: 1.8rem; font-weight: bold; color: var(--teal); display: block; line-height: 1; margin-bottom: 0.3rem; }
+  .stat-tile .stat-label { font-size: 0.78rem; color: var(--offwhite); display: block; margin-bottom: 0.2rem; }
+  .stat-tile .stat-sub { font-size: 0.7rem; color: var(--teal2); font-style: italic; display: block; }
+
+  /* ── MARKET CHART ── */
+  .market-chart { margin: 1.2rem 0; }
+  .chart-title { font-size: 0.72rem; color: var(--teal); font-family: monospace; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 120px; }
+  .bar-group { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; gap: 0.25rem; }
+  .bar { width: 100%; border-radius: 0.2rem 0.2rem 0 0; }
+  .bar-val { font-family: monospace; font-size: 0.68rem; color: var(--teal); }
+  .bar-label { font-size: 0.65rem; color: var(--slate); text-align: center; }
+  .bar-projected { opacity: 0.7; }
+
+  /* ── PRODUCT CARDS ── */
+  .product-track { margin-bottom: 1.5rem; }
+  .track-label { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; font-family: monospace; padding: 0.25rem 0.65rem; border-radius: 0.2rem; display: inline-block; margin-bottom: 0.75rem; }
+  .track-label.edu { background: rgba(0,194,212,0.15); color: var(--teal); border: 1px solid rgba(0,194,212,0.3); }
+  .track-label.ind { background: rgba(245,166,35,0.12); color: var(--gold); border: 1px solid rgba(245,166,35,0.3); }
+  .product-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 0.65rem; }
+  .product-card { background: var(--card2); border-radius: 0.6rem; padding: 0.9rem; border: 1px solid rgba(26,77,181,0.25); transition: border-color 0.3s; }
+  .product-card:hover { border-color: var(--teal); }
+  .product-card .pname { font-weight: bold; color: var(--white); font-size: 0.85rem; margin-bottom: 0.2rem; }
+  .product-card .pspec { font-family: monospace; font-size: 0.72rem; color: var(--teal); margin-bottom: 0.2rem; }
+  .product-card .pdetail { font-size: 0.73rem; color: var(--slate); line-height: 1.4; }
+  .track-insight { font-size: 0.8rem; color: var(--slate); font-style: italic; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(26,77,181,0.2); }
+  .track-insight strong { color: var(--teal); }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; position: relative; padding-left: 2rem; }
+  .timeline::before { content: ''; position: absolute; left: 0.45rem; top: 0.6rem; bottom: 0.6rem; width: 2px; background: linear-gradient(to bottom, var(--teal), var(--blue), var(--gold)); }
+  .tl-item { display: grid; grid-template-columns: 65px 1fr; gap: 0.6rem; align-items: start; padding: 0.4rem 0; position: relative; }
+  .tl-item::before { content: ''; position: absolute; left: -1.65rem; top: 0.65rem; width: 9px; height: 9px; border-radius: 50%; background: var(--teal); border: 2px solid var(--navy); }
+  .tl-item.future::before { background: var(--gold); }
+  .tl-year { font-family: monospace; font-size: 0.78rem; color: var(--gold); font-weight: bold; padding-top: 0.1rem; }
+  .tl-text { font-size: 0.85rem; color: var(--offwhite); line-height: 1.4; }
+
+  /* ── FUNDING CHART ── */
+  .funding-viz { display: flex; align-items: flex-end; gap: 0.5rem; height: 140px; margin: 1rem 0; }
+  .funding-bar-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; gap: 0.25rem; }
+  .funding-bar { width: 100%; border-radius: 0.2rem 0.2rem 0 0; min-height: 4px; }
+  .fb-teal { background: linear-gradient(to top, var(--teal2), var(--teal)); }
+  .fb-gold { background: linear-gradient(to top, #b45309, var(--gold)); }
+  .funding-bar-val { font-family: monospace; font-size: 0.68rem; text-align: center; }
+  .funding-bar-label { font-size: 0.65rem; color: var(--slate); text-align: center; }
+
+  /* ── COMPETITION ── */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 1rem; }
+  .comp-table th { background: var(--blue); color: var(--white); padding: 0.65rem 0.85rem; text-align: left; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .comp-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid rgba(26,77,181,0.2); color: var(--offwhite); vertical-align: top; line-height: 1.45; }
+  .comp-table tr:nth-child(even) td { background: rgba(19,34,68,0.5); }
+  .comp-table tr.highlight-row td { background: rgba(0,194,212,0.07); }
+  .comp-table tr.highlight-row td:first-child { color: var(--teal); font-weight: bold; }
+  .tag-physical { color: var(--green); font-weight: bold; }
+  .tag-cloud { color: var(--amber); }
+  .comp-note { font-size: 0.72rem; color: var(--slate); font-style: italic; margin-top: 0.25rem; }
+
+  /* ── RISK HEAT MAP ── */
+  .risk-matrix {
+    display: grid; grid-template-columns: auto repeat(3, 1fr);
+    gap: 2px; margin: 1rem 0;
+    font-size: 0.72rem;
+  }
+  .rm-header { background: var(--navy3); color: var(--slate); padding: 0.4rem 0.5rem; text-align: center; font-family: monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .rm-row-label { background: var(--card2); color: var(--slate); padding: 0.4rem 0.6rem; display: flex; align-items: center; font-size: 0.72rem; }
+  .rm-cell { padding: 0.5rem; text-align: center; border-radius: 0.15rem; color: var(--white); font-weight: 600; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; }
+  .heat-low { background: rgba(22,163,74,0.3); color: #86efac; }
+  .heat-med { background: rgba(245,158,11,0.35); color: #fde68a; }
+  .heat-high { background: rgba(220,38,38,0.4); color: #fca5a5; }
+  .heat-vhigh { background: rgba(220,38,38,0.7); color: #fee2e2; }
+
+  /* ── SR COLUMNS ── */
+  .sr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .sr-col { border-radius: 0.75rem; padding: 1.25rem; }
+  .sr-col.strengths { background: rgba(22,163,74,0.08); border: 1px solid rgba(22,163,74,0.3); }
+  .sr-col.risks { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.3); }
+  .sr-header { display: flex; align-items: center; gap: 0.5rem; font-family: Georgia, serif; font-size: 1.05rem; font-weight: bold; margin-bottom: 0.85rem; }
+  .sr-header.s { color: var(--green); }
+  .sr-header.r { color: var(--red); }
+  .sr-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .sr-list li { font-size: 0.85rem; color: var(--offwhite); padding-left: 1.1rem; position: relative; line-height: 1.5; }
+  .sr-list li::before { content: '→'; position: absolute; left: 0; color: var(--slate); font-family: monospace; }
+
+  /* ── EVIDENCE ── */
+  .evidence-stack { display: flex; flex-direction: column; gap: 0.9rem; }
+  .evidence-card { background: var(--card); border-radius: 0.75rem; padding: 1.1rem 1.3rem; border-left: 3px solid var(--teal); }
+  .evidence-card:nth-child(2) { border-left-color: var(--blue); }
+  .evidence-card:nth-child(3) { border-left-color: var(--gold); }
+  .evidence-stat { font-family: monospace; font-size: 1.3rem; font-weight: bold; color: var(--teal); margin-bottom: 0.2rem; }
+  .evidence-card:nth-child(2) .evidence-stat { color: var(--offwhite); }
+  .evidence-card:nth-child(3) .evidence-stat { color: var(--gold); }
+  .evidence-body { font-size: 0.85rem; color: var(--offwhite); line-height: 1.6; margin-bottom: 0.45rem; }
+  .evidence-caveat { font-size: 0.76rem; color: var(--amber); font-style: italic; display: flex; align-items: flex-start; gap: 0.35rem; }
+  .methods-critique { background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.25); border-radius: 0.6rem; padding: 1rem 1.2rem; margin-top: 0.9rem; }
+  .methods-critique h3 { color: var(--amber); font-size: 0.9rem; margin-bottom: 0.6rem; }
+  .methods-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .methods-list li { font-size: 0.82rem; color: var(--offwhite); padding-left: 1rem; position: relative; line-height: 1.45; }
+  .methods-list li::before { content: '?'; position: absolute; left: 0; color: var(--amber); font-family: monospace; font-weight: bold; }
+
+  /* ── EXIT STRATEGY ── */
+  .exit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 0.8rem; margin: 1rem 0; }
+  .exit-card { background: var(--card); border-radius: 0.6rem; padding: 1rem; border: 1px solid rgba(26,77,181,0.3); }
+  .exit-card .exit-type { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; font-family: monospace; color: var(--teal); margin-bottom: 0.3rem; }
+  .exit-card .exit-name { font-weight: bold; color: var(--white); font-size: 0.9rem; margin-bottom: 0.3rem; }
+  .exit-card .exit-detail { font-size: 0.78rem; color: var(--slate); line-height: 1.4; }
+  .exit-card .exit-likelihood { display: inline-block; margin-top: 0.4rem; font-size: 0.68rem; font-family: monospace; padding: 0.15rem 0.4rem; border-radius: 0.2rem; }
+  .likely { background: rgba(22,163,74,0.2); color: #86efac; }
+  .possible { background: rgba(245,158,11,0.2); color: #fde68a; }
+  .speculative { background: rgba(148,163,184,0.2); color: var(--slate); }
+
+  /* ── RECOMMENDATION ── */
+  #recommendation { background: radial-gradient(ellipse at 30% 50%, rgba(26,77,181,0.2) 0%, transparent 60%), var(--navy); }
+  .verdict-block { background: var(--card); border-radius: 1rem; padding: 1.75rem 2.25rem; border: 1px solid rgba(245,166,35,0.3); max-width: 900px; }
+  .verdict-title { font-family: Georgia, serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); color: var(--gold); font-weight: bold; margin-bottom: 0.4rem; }
+  .verdict-subtitle { font-size: 0.95rem; color: var(--offwhite); font-style: italic; margin-bottom: 0.5rem; max-width: 60ch; line-height: 1.6; }
+  .verdict-profile {
+    background: rgba(0,194,212,0.07); border: 1px solid rgba(0,194,212,0.2);
+    border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 1.25rem;
+    font-size: 0.85rem; color: var(--offwhite); line-height: 1.6;
+  }
+  .verdict-profile strong { color: var(--teal); }
+  .invest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .invest-col { border-radius: 0.5rem; padding: 1rem; }
+  .invest-col.if { background: rgba(22,163,74,0.1); border: 1px solid rgba(22,163,74,0.25); }
+  .invest-col.watch { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); }
+  .invest-col .ic-head { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.65rem; }
+  .invest-col.if .ic-head { color: var(--green); }
+  .invest-col.watch .ic-head { color: var(--amber); }
+  .invest-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .invest-col ul li { font-size: 0.82rem; color: var(--offwhite); padding-left: 1rem; position: relative; line-height: 1.4; }
+  .invest-col ul li::before { content: '·'; position: absolute; left: 0; color: var(--slate); }
+  .bottom-line { background: var(--blue); border-radius: 0.5rem; padding: 0.8rem 1.1rem; font-size: 0.88rem; color: var(--white); font-weight: 600; text-align: center; line-height: 1.5; }
+
+  /* ── SOURCES ── */
+  #sources { background: var(--navy2); min-height: auto; padding: 4rem 5rem 4rem 4rem; }
+  .sources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 2rem; margin-top: 0.75rem; }
+  .source-item { font-size: 0.78rem; color: var(--slate); padding: 0.3rem 0; border-bottom: 1px solid rgba(26,77,181,0.15); line-height: 1.4; }
+  .source-item span { color: var(--offwhite); }
+  .source-item a { color: var(--teal); text-decoration: none; }
+  .source-item a:hover { text-decoration: underline; }
+  .source-caveat { margin-top: 1.25rem; font-size: 0.78rem; color: var(--amber); font-style: italic; max-width: 80ch; }
+
+  /* ── AUTHOR FOOTER ── */
+  .author-footer {
+    background: var(--card2); border-top: 1px solid rgba(26,77,181,0.3);
+    padding: 1.5rem 4rem; display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  .author-info .author-name { font-family: Georgia, serif; font-size: 1rem; color: var(--white); }
+  .author-info .author-program { font-size: 0.78rem; color: var(--slate); font-family: monospace; }
+  .author-info .author-course { font-size: 0.75rem; color: var(--teal); margin-top: 0.15rem; }
+  .verdict-final { font-family: monospace; font-size: 0.72rem; color: var(--gold); text-align: right; line-height: 1.6; }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    section { padding: 4rem 1.5rem 4rem 2.5rem; }
+    .sr-grid, .invest-grid, .sources-grid { grid-template-columns: 1fr; }
+    .orbit-container, #sidenav { display: none; }
+    #verdict-badge { top: 0.5rem; right: 0.5rem; }
+    h1 { font-size: 2.1rem; }
+    .qs-row { grid-template-columns: 1fr 1fr; }
+    .qs-cell.source-col { display: none; }
+    .risk-matrix { font-size: 0.65rem; }
+    .author-footer { padding: 1.5rem 2rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- VERDICT BADGE -->
+<div id="verdict-badge">
+  <span class="badge-label">EVA Verdict</span>
+  <span class="badge-verdict">CONDITIONAL<br>INVEST</span>
+  <span class="badge-sub">High opportunity · Geo risk</span>
+</div>
+
+<!-- SIDE NAV -->
+<nav id="sidenav" aria-label="Section navigation">
+  <div class="nav-dot active" data-target="hero"><span class="nav-label">Overview</span></div>
+  <div class="nav-dot" data-target="market"><span class="nav-label">Market</span></div>
+  <div class="nav-dot" data-target="products"><span class="nav-label">Products</span></div>
+  <div class="nav-dot" data-target="traction"><span class="nav-label">Traction</span></div>
+  <div class="nav-dot" data-target="competition"><span class="nav-label">Competition</span></div>
+  <div class="nav-dot" data-target="strengths"><span class="nav-label">Strengths & Risks</span></div>
+  <div class="nav-dot" data-target="edtech"><span class="nav-label">EdTech Evidence</span></div>
+  <div class="nav-dot" data-target="exit"><span class="nav-label">Exit Strategy</span></div>
+  <div class="nav-dot" data-target="recommendation"><span class="nav-label">Recommendation</span></div>
+  <div class="nav-dot" data-target="sources"><span class="nav-label">Sources</span></div>
+</nav>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<section id="hero">
+  <div class="hero-content">
+    <p class="hero-eyebrow">Educational Venture Analysis · Quantum Computing Education</p>
+    <h1><span>SpinQ</span> Technology</h1>
+    <p class="hero-sub">Quantum Hardware for the Classroom: A Market Worth Betting On?</p>
+
+    <!-- QUICK STATS TABLE -->
+    <div class="quick-stats reveal">
+      <div class="qs-header">Key Metrics at a Glance</div>
+      <div class="qs-row" style="background:rgba(26,77,181,0.1);">
+        <div class="qs-cell label">Metric</div>
+        <div class="qs-cell label">Value</div>
+        <div class="qs-cell label">Source</div>
+      </div>
+      <div class="qs-row">
+        <div class="qs-cell label">Founded</div>
+        <div class="qs-cell value">2018, Shenzhen</div>
+        <div class="qs-cell source-col">Company disclosures</div>
+      </div>
+      <div class="qs-row">
+        <div class="qs-cell label">Institutions deployed</div>
+        <div class="qs-cell value">200+</div>
+        <div class="qs-cell source-col">Company disclosures</div>
+      </div>
+      <div class="qs-row">
+        <div class="qs-cell label">Countries served</div>
+        <div class="qs-cell value">40+</div>
+        <div class="qs-cell source-col">Company disclosures</div>
+      </div>
+      <div class="qs-row">
+        <div class="qs-cell label">2024 Revenue</div>
+        <div class="qs-cell value">¥50M+ RMB</div>
+        <div class="qs-cell source-col">Company report (unaudited)</div>
+      </div>
+      <div class="qs-row">
+        <div class="qs-cell label">Series C (2026)</div>
+        <div class="qs-cell value">~¥1B RMB</div>
+        <div class="qs-cell source-col">Quantum Insider / press</div>
+      </div>
+      <div class="qs-row">
+        <div class="qs-cell label">IPO Status</div>
+        <div class="qs-cell value">Pre-IPO (HK/Shenzhen)</div>
+        <div class="qs-cell source-col">Industry press, unconfirmed</div>
+      </div>
+      <div class="qs-row">
+        <div class="qs-cell label">EVA Verdict</div>
+        <div class="qs-cell value qs-verdict">Conditional Invest</div>
+        <div class="qs-cell source-col">This analysis</div>
+      </div>
+    </div>
+
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="meta-label">Investor Type</span>
+        <span class="meta-val">University Foundations · EdTech VCs · STEM Funds</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="meta-label">Market</span>
+        <span class="meta-val">Quantum Computing Education</span>
+      </div>
+    </div>
+    <a href="#market" class="scroll-cta">Read the analysis <span class="arrow">↓</span></a>
+  </div>
+
+  <div class="orbit-container" aria-hidden="true">
+    <div class="orbit orbit-1"><div class="electron"></div></div>
+    <div class="orbit orbit-2"><div class="electron electron-gold"></div></div>
+    <div class="orbit orbit-3"><div class="electron"></div></div>
+    <div class="nucleus"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ MARKET ═══════════════════════════════ -->
+<section id="market">
+  <p class="section-eyebrow">01 · Market Context</p>
+  <h2>Why Quantum Education — Why Now?</h2>
+  <p class="lead">Quantum technology is moving from lab to workforce. The education pipeline is dangerously empty.</p>
+
+  <div class="stat-row reveal">
+    <div class="stat-tile">
+      <span class="stat-val">$1.3B</span>
+      <span class="stat-label">Quantum computing market (2024)</span>
+      <span class="stat-sub">→ $5.3B by 2029 · 32.7% CAGR <span class="cite" data-source="Quantum Insider Market Forecast 2024">QI</span></span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-val">1:3</span>
+      <span class="stat-label">Graduates to open quantum job positions</span>
+      <span class="stat-sub">Critical talent gap <span class="cite" data-source="McKinsey Quantum Workforce Report">McK</span></span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-val">250K+</span>
+      <span class="stat-label">New quantum professionals needed by 2030</span>
+      <span class="stat-sub">UN Year of Quantum · 2025 <span class="cite" data-source="arXiv:2202.08940 — Defining the Quantum Workforce Landscape">QED-C</span></span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-val">&gt;$40B</span>
+      <span class="stat-label">Government quantum R&amp;D investment to date</span>
+      <span class="stat-sub">US, China, EU racing <span class="cite" data-source="McKinsey Global Quantum Technology Report">McK</span></span>
+    </div>
+  </div>
+
+  <div class="reveal market-chart">
+    <div class="chart-title">Quantum computing market growth, $B (projected) <span class="cite" data-source="Quantum Insider Market Forecast 2024">QI 2024</span></div>
+    <div class="bar-chart">
+      <div class="bar-group"><div class="bar fb-teal" style="height:22px;background:linear-gradient(to top,#0D9488,#00C2D4)"></div><div class="bar-val" style="color:var(--teal)">0.8</div><div class="bar-label">2022</div></div>
+      <div class="bar-group"><div class="bar fb-teal" style="height:32px;background:linear-gradient(to top,#0D9488,#00C2D4)"></div><div class="bar-val" style="color:var(--teal)">1.1</div><div class="bar-label">2023</div></div>
+      <div class="bar-group"><div class="bar fb-teal" style="height:44px;background:linear-gradient(to top,#0D9488,#00C2D4)"></div><div class="bar-val" style="color:var(--teal)">1.3</div><div class="bar-label">2024</div></div>
+      <div class="bar-group"><div class="bar bar-projected" style="height:58px;background:linear-gradient(to top,#1A4DB5,#00C2D4)"></div><div class="bar-val" style="color:var(--slate)">1.9</div><div class="bar-label">2025P</div></div>
+      <div class="bar-group"><div class="bar bar-projected" style="height:76px;background:linear-gradient(to top,#1A4DB5,#00C2D4)"></div><div class="bar-val" style="color:var(--slate)">2.5</div><div class="bar-label">2026P</div></div>
+      <div class="bar-group"><div class="bar bar-projected" style="height:99px;background:linear-gradient(to top,#1A4DB5,#00C2D4)"></div><div class="bar-val" style="color:var(--slate)">3.4</div><div class="bar-label">2027P</div></div>
+      <div class="bar-group"><div class="bar bar-projected" style="height:120px;background:linear-gradient(to top,#b45309,var(--gold))"></div><div class="bar-val" style="color:var(--gold)">5.3</div><div class="bar-label">2029P</div></div>
+    </div>
+    <p style="font-size:0.68rem;color:var(--slate);margin-top:0.4rem;">P = projected · Darker bars indicate forecasts</p>
+  </div>
+
+  <div class="card reveal" style="max-width:680px; border-color:rgba(245,166,35,0.4);">
+    <h3 style="color:var(--gold);">The Core Investment Thesis</h3>
+    <p style="font-size:0.9rem; color:var(--offwhite); line-height:1.7;">
+      Governments worldwide are pouring billions into quantum R&amp;D, but the workforce pipeline hasn't kept pace.
+      SpinQ's bet: <strong style="color:var(--teal);">the company currently leading commercialization of affordable classroom quantum hardware at significant scale</strong> — 
+      a gap no Western competitor has meaningfully entered.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ PRODUCTS ═══════════════════════════════ -->
+<section id="products">
+  <p class="section-eyebrow">02 · Product Portfolio</p>
+  <h2>A Dual-Track Model</h2>
+  <p class="lead">Education drives awareness and adoption. Industrial is the long-term revenue engine.</p>
+
+  <div class="product-track reveal">
+    <span class="track-label edu">Track 1 · Education NMR Hardware <span class="cite" data-source="SpinQ Technology official site — spinquanta.com">SpinQ</span></span>
+    <div class="product-cards">
+      <div class="product-card">
+        <div class="pname">Gemini Mini</div>
+        <div class="pspec">2 qubits · ~$5K</div>
+        <div class="pdetail">Portable, room temperature, maintenance-free. Entry-level classroom device.</div>
+      </div>
+      <div class="product-card">
+        <div class="pname">Gemini / Mini Pro</div>
+        <div class="pspec">2 qubits · ~$15–50K</div>
+        <div class="pdetail">Professional classroom tier with expanded connectivity and software.</div>
+      </div>
+      <div class="product-card">
+        <div class="pname">Triangulum II</div>
+        <div class="pspec">3 qubits · ~$57K</div>
+        <div class="pdetail">World's first commercial 3-qubit NMR desktop system. <span class="cite" data-source="arXiv:2202.02983 — SpinQ Triangulum paper">arXiv</span></div>
+      </div>
+      <div class="product-card">
+        <div class="pname">Gemini Lab</div>
+        <div class="pspec">Integrated Platform</div>
+        <div class="pdetail">Touchscreen UI, built-in curriculum, SpinQit SDK (Python/Qiskit compatible).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-track reveal">
+    <span class="track-label ind">Track 2 · Superconducting / Industrial</span>
+    <div class="product-cards">
+      <div class="product-card">
+        <div class="pname">SPINQ SQC</div>
+        <div class="pspec">2–20 qubits · ~$2–5M</div>
+        <div class="pdetail">Enterprise superconducting systems for research institutions and national labs.</div>
+      </div>
+      <div class="product-card">
+        <div class="pname">SPINQ QPU C Series</div>
+        <div class="pspec">Chip Foundry</div>
+        <div class="pdetail">99.9%+ single-qubit gate fidelity. First Chinese superconducting chip exported (Middle East, 2023). <span class="cite" data-source="Quantum Zeitgeist — China Quantum Computing Companies 2026">QZ</span></div>
+      </div>
+      <div class="product-card">
+        <div class="pname">SpinQ Cloud (QaaS)</div>
+        <div class="pspec">Cloud Platform</div>
+        <div class="pdetail">Quantum-as-a-service enabling remote hardware access for institutions without physical devices.</div>
+      </div>
+      <div class="product-card">
+        <div class="pname">SPINQ QEDA</div>
+        <div class="pspec">Design Software</div>
+        <div class="pdetail">Quantum chip design and EDA software for researchers and advanced users.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="track-insight reveal">
+    <strong>Key structural insight:</strong> The $5K classroom device is not the business — it's the top of a funnel.
+    Students who learn on SpinQ hardware become advocates for institutional superconducting procurement worth millions.
+  </p>
+</section>
+
+<!-- ═══════════════════════════════ TRACTION ═══════════════════════════════ -->
+<section id="traction">
+  <p class="section-eyebrow">03 · Market Traction</p>
+  <h2>SpinQ by the Numbers</h2>
+  <p class="lead">Revenue and customers that are rare for a quantum company at this stage — with important sourcing caveats.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start;">
+    <div>
+      <div class="stat-row reveal" style="grid-template-columns:1fr 1fr; margin-bottom:0.75rem;">
+        <div class="stat-tile">
+          <span class="stat-val">200+</span>
+          <span class="stat-label">Institutions deployed</span>
+          <span class="stat-sub"><span class="cite" data-source="Company disclosures — spinquanta.com. Not independently audited.">Co.</span></span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-val">40+</span>
+          <span class="stat-label">Countries served</span>
+          <span class="stat-sub"><span class="cite" data-source="Company disclosures — spinquanta.com. Not independently audited.">Co.</span></span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-val">¥50M+</span>
+          <span class="stat-label">Revenue 2024 (RMB)</span>
+          <span class="stat-sub"><span class="cite" data-source="Company report — unaudited, self-reported. No independent verification available.">Co. report</span></span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-val">~¥1B</span>
+          <span class="stat-label">Series C total (2026)</span>
+          <span class="stat-sub"><span class="cite" data-source="Quantum Insider, June 2026. Press coverage — not audited.">Press</span></span>
+        </div>
+      </div>
+      <div class="card reveal" style="font-size:0.78rem; color:var(--amber); border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.05); padding:0.75rem 1rem;">
+        ⚠ All company figures above are self-reported or drawn from press coverage. No independently audited financials are publicly available for this pre-IPO company. Investors should treat these as indicative, not confirmed.
+      </div>
+
+      <div class="reveal" style="margin-top:1rem;">
+        <div class="chart-title" style="font-size:0.7rem; color:var(--teal); font-family:monospace; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.6rem;">Funding trajectory (¥M RMB, est.) <span class="cite" data-source="Quantum Insider; Quantum Zeitgeist; press reports. Figures are estimates.">Press</span></div>
+        <div class="funding-viz">
+          <div class="funding-bar-wrap"><div class="funding-bar fb-teal" style="height:9px;"></div><div class="funding-bar-val" style="color:var(--teal)">15</div><div class="funding-bar-label">2019</div></div>
+          <div class="funding-bar-wrap"><div class="funding-bar fb-teal" style="height:18px;"></div><div class="funding-bar-val" style="color:var(--teal)">30</div><div class="funding-bar-label">2020</div></div>
+          <div class="funding-bar-wrap"><div class="funding-bar fb-teal" style="height:32px;"></div><div class="funding-bar-val" style="color:var(--teal)">55</div><div class="funding-bar-label">2021</div></div>
+          <div class="funding-bar-wrap"><div class="funding-bar fb-teal" style="height:52px;"></div><div class="funding-bar-val" style="color:var(--teal)">90</div><div class="funding-bar-label">2022</div></div>
+          <div class="funding-bar-wrap"><div class="funding-bar fb-teal" style="height:75px;"></div><div class="funding-bar-val" style="color:var(--teal)">130</div><div class="funding-bar-label">2023</div></div>
+          <div class="funding-bar-wrap"><div class="funding-bar fb-gold" style="height:116px;"></div><div class="funding-bar-val" style="color:var(--gold)">400</div><div class="funding-bar-label">2025 B</div></div>
+          <div class="funding-bar-wrap"><div class="funding-bar fb-gold" style="height:140px;"></div><div class="funding-bar-val" style="color:var(--gold)">~1K</div><div class="funding-bar-label">2026 C</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div style="font-size:0.7rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-family:monospace; margin-bottom:0.85rem;">Company milestones</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-year">2018</div><div class="tl-text">Founded in Shenzhen by Tsinghua &amp; Harvard alumni</div></div>
+        <div class="tl-item"><div class="tl-year">2020</div><div class="tl-text">World's first programmable desktop NMR quantum computer (Gemini) <span class="cite" data-source="SpinQ Gemini paper — EPJ Quantum Technology (2021)">EPJ</span></div></div>
+        <div class="tl-item"><div class="tl-year">2022</div><div class="tl-text">Gemini Mini released (~$5K); Triangulum 3-qubit launched <span class="cite" data-source="Tom's Hardware, Dec. 2022">TH</span></div></div>
+        <div class="tl-item"><div class="tl-year">2023</div><div class="tl-text">First Chinese export of superconducting quantum chip (Middle East) <span class="cite" data-source="Quantum Zeitgeist 2026">QZ</span></div></div>
+        <div class="tl-item"><div class="tl-year">2024</div><div class="tl-text">Revenue exceeds ¥50M; 200+ deployments in 40+ countries <span class="cite" data-source="Company disclosures — unaudited">Co.</span></div></div>
+        <div class="tl-item future"><div class="tl-year">2025</div><div class="tl-text">Series B raised; UN Year of Quantum amplifies global policy tailwinds</div></div>
+        <div class="tl-item future"><div class="tl-year">2026</div><div class="tl-text">Series C ~¥1B total; IPO expected on HK/Shenzhen exchange <span class="cite" data-source="Quantum Insider, June 2026 — unconfirmed press reporting">Press</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ COMPETITION ═══════════════════════════════ -->
+<section id="competition">
+  <p class="section-eyebrow">04 · Competitive Landscape</p>
+  <h2>Who Else Is In the Room?</h2>
+  <p class="lead">SpinQ leads in physical classroom hardware — but the competitive picture is more nuanced than qubit counts suggest.</p>
+
+  <div class="reveal" style="overflow-x:auto;">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Competitor</th>
+          <th>Education Approach</th>
+          <th>Hardware</th>
+          <th>Cost</th>
+          <th>Distribution Advantage</th>
+          <th>Switching Cost for Universities</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td>SpinQ</td>
+          <td>NMR desktop hardware + curriculum + cloud</td>
+          <td><span class="tag-physical">✓ Physical · 2–3 qubits</span></td>
+          <td>$5K–$57K</td>
+          <td>First-mover; no direct competitor</td>
+          <td>Low — standalone device, no ecosystem dependency</td>
+        </tr>
+        <tr>
+          <td>IBM Quantum</td>
+          <td>Cloud simulators + Qiskit open-source SDK</td>
+          <td><span class="tag-cloud">Cloud · 127–1,121 qubits</span></td>
+          <td>Free (cloud)</td>
+          <td>Dominant brand; Qiskit is the industry standard SDK <span class="cite" data-source="Qiskit is used by the majority of quantum computing courses and industry positions globally">⚑</span></td>
+          <td><strong style="color:var(--red);">Very high</strong> — Qiskit is the industry job-market standard; students need it for careers</td>
+        </tr>
+        <tr>
+          <td>Microsoft Azure Quantum</td>
+          <td>Azure cloud + Q# certifications + hybrid tools</td>
+          <td><span class="tag-cloud">Cloud · Various</span></td>
+          <td>Free tier + paid</td>
+          <td>Enterprise Azure relationships; university research agreements</td>
+          <td>High — Azure ecosystem lock-in; Microsoft research partnerships</td>
+        </tr>
+        <tr>
+          <td>IonQ / Quantinuum</td>
+          <td>Cloud access for researchers; no education kit</td>
+          <td><span class="tag-cloud">Cloud · 11–300+ qubits</span></td>
+          <td>$$$$ (HPC tier)</td>
+          <td>Accuracy leadership; growing academic partnerships</td>
+          <td>Medium — specialized tool, not a teaching platform</td>
+        </tr>
+        <tr>
+          <td>D-Wave</td>
+          <td>Leap LaunchPad (free 3-month cloud trial)</td>
+          <td><span class="tag-cloud">Cloud · 5,000+ anneal</span></td>
+          <td>Free trial</td>
+          <td>Strong optimization niche; existing research base</td>
+          <td>Low — different computing paradigm (annealing vs. gate)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card reveal" style="margin-top:1.25rem; border-color:rgba(220,38,38,0.4); background:rgba(220,38,38,0.05);">
+    <h3 style="color:var(--red);">The Qiskit Problem: A Structural Weakness Investors Must Weigh</h3>
+    <p style="font-size:0.86rem; color:var(--offwhite); line-height:1.7; margin-bottom:0.5rem;">
+      IBM's Qiskit is the dominant SDK for quantum computing education and the vast majority of quantum industry jobs. 
+      Universities already running Qiskit-based courses face <strong>genuine curriculum switching costs</strong> to adopt SpinQ. 
+      SpinQ's own SpinQit SDK is Qiskit-compatible — a pragmatic response — but students learning on SpinQ's NMR hardware 
+      gain experience with a <strong style="color:var(--amber);">physical technology (NMR) that does not reflect any industrial quantum computing paradigm</strong> 
+      (superconducting, trapped ion, or photonic). This creates a potential credibility gap: does SpinQ produce quantum-ready graduates, or quantum-curious ones?
+    </p>
+    <p style="font-size:0.82rem; color:var(--slate); font-style:italic;">
+      SpinQ's counter-argument: conceptual foundations transfer. A student who understands superposition on an NMR device learns quantum intuition that applies to any platform. This is pedagogically defensible but warrants scrutiny.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ STRENGTHS ═══════════════════════════════ -->
+<section id="strengths">
+  <p class="section-eyebrow">05 · Investment Analysis</p>
+  <h2>Strengths &amp; Risks</h2>
+  <p class="lead reveal">An honest accounting of what SpinQ has built — and what could unravel it.</p>
+
+  <div class="sr-grid reveal">
+    <div class="sr-col strengths">
+      <div class="sr-header s">✓ Strengths</div>
+      <ul class="sr-list">
+        <li>Currently leading commercialization of physical education quantum hardware — no direct rival at scale globally</li>
+        <li>Proven revenue (¥50M+ in 2024) and 200+ institutional customers across 40+ countries <span class="cite" data-source="Company disclosures — unaudited">Co.</span></li>
+        <li>Price-point disruption: $5K device vs. $1M+ superconducting alternative</li>
+        <li>Dual-track model creates a built-in institutional customer pipeline</li>
+        <li>Strong academic pedigree (Tsinghua/Harvard founders); key university partnerships</li>
+        <li>Full-stack vertical integration: hardware, software, cloud, and curriculum</li>
+        <li>UN Year of Quantum (2025) amplifies global policy and funding tailwinds</li>
+      </ul>
+    </div>
+    <div class="sr-col risks">
+      <div class="sr-header r">⚠ Risks</div>
+      <ul class="sr-list">
+        <li><strong>Geopolitical:</strong> US export controls on quantum tech; US universities may face political pressure to avoid Chinese hardware <span class="cite" data-source="US-China ESRC Report: Vying for Quantum Supremacy (Nov. 2025)">ESRC</span></li>
+        <li><strong>NMR ceiling:</strong> 2–3 qubit NMR is physically unscalable — a pedagogical demo, not the future of computing</li>
+        <li><strong>Industry alignment gap:</strong> Most quantum jobs use Qiskit/superconducting platforms, not NMR — reducing SpinQ's career-readiness argument</li>
+        <li><strong>Tech obsolescence:</strong> IBM cloud gives free access to 100+ qubit systems — may outcompete SpinQ's value proposition</li>
+        <li><strong>State dependency:</strong> Government-backed investors create strings; national security perceptions hurt Western sales</li>
+        <li><strong>Profitability deferred:</strong> CEO states profitability is a "long-term goal, not short-term priority"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- RISK HEAT MAP -->
+  <div class="reveal" style="margin-top:1.5rem;">
+    <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-family:monospace; margin-bottom:0.6rem;">Risk heat map — Likelihood × Impact</div>
+    <div class="risk-matrix">
+      <div class="rm-header"></div>
+      <div class="rm-header">Low Impact</div>
+      <div class="rm-header">Medium Impact</div>
+      <div class="rm-header">High Impact</div>
+
+      <div class="rm-row-label">High likelihood</div>
+      <div class="rm-cell heat-med">—</div>
+      <div class="rm-cell heat-high">NMR scalability ceiling</div>
+      <div class="rm-cell heat-vhigh">Qiskit ecosystem dominance</div>
+
+      <div class="rm-row-label">Medium likelihood</div>
+      <div class="rm-cell heat-low">—</div>
+      <div class="rm-cell heat-med">IBM free cloud competition</div>
+      <div class="rm-cell heat-high">US export controls</div>
+
+      <div class="rm-row-label">Low likelihood</div>
+      <div class="rm-cell heat-low">—</div>
+      <div class="rm-cell heat-low">Western competitor entry</div>
+      <div class="rm-cell heat-med">China political escalation</div>
+    </div>
+  </div>
+
+  <div class="card reveal" style="margin-top:1.25rem; border-color:rgba(220,38,38,0.3); background:rgba(220,38,38,0.05);">
+    <h3 style="color:var(--red);">The Geopolitical Risk in Detail</h3>
+    <p style="font-size:0.86rem; color:var(--offwhite); line-height:1.7;">
+      The US-China Economic &amp; Security Review Commission has explicitly identified SpinQ as one of only two globally competitive Chinese quantum companies (Nov. 2025). <span class="cite" data-source="US-China Economic & Security Review Commission: Vying for Quantum Supremacy, Nov. 2025">ESRC</span>
+      That visibility validates SpinQ's importance but also makes it a potential target for procurement bans at US and allied universities.
+      This risk is priceable — not disqualifying — but Western investors must verify that sales into their target markets are not curtailed by evolving export controls. <span class="cite" data-source="Lawfare: Technology Controls to Contain China's Quantum Ambitions, Aug. 2024">Lawfare</span>
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ EDTECH ═══════════════════════════════ -->
+<section id="edtech">
+  <p class="section-eyebrow">06 · EdTech Assessment</p>
+  <h2>Does It Actually Teach?</h2>
+  <p class="lead">The pedagogical case is compelling on its face — but the evidence base requires serious scrutiny.</p>
+
+  <div class="evidence-stack reveal">
+    <div class="evidence-card">
+      <div class="evidence-stat">89% vs. &lt;40% retention <span class="cite" data-source="SpinQ internal Q1 2024 data — vendor-published, not peer-reviewed. No sample sizes, control conditions, or methodology disclosed.">Vendor</span></div>
+      <div class="evidence-body">
+        Student retention after 3 weeks: SpinQ hardware deployments reportedly drove 89% retention versus below 40% for simulator-only courses.
+        Vassar College students reported deeper conceptual understanding compared to classical simulation. <span class="cite" data-source="Vassar College / SpinQ Gemini Lab case study, Aug. 2025">Vassar</span>
+      </div>
+      <div class="evidence-caveat">⚠ Vendor-reported only. No sample sizes, randomization, or control conditions disclosed.</div>
+    </div>
+    <div class="evidence-card">
+      <div class="evidence-stat">2.3× higher assessment scores <span class="cite" data-source="Cited in SpinQ 2024 whitepaper. Original MIT study not independently published or peer-reviewed.">Vendor (MIT)</span></div>
+      <div class="evidence-body">
+        MIT cohort study (cited in SpinQ 2024 whitepaper): students with 40% hardware lab time scored 2.3× higher on conceptual exams and showed 78% more frequent correct error mitigation techniques versus simulator-only peers.
+      </div>
+      <div class="evidence-caveat">⚠ Published in vendor materials only — no independent peer-reviewed confirmation. Original study not publicly available.</div>
+    </div>
+    <div class="evidence-card">
+      <div class="evidence-stat">47% lower TCO over 5 years <span class="cite" data-source="UofT/NUS/TU Munich joint analysis, March 2024. Methodology not independently peer-reviewed.">Multi-inst.</span></div>
+      <div class="evidence-body">
+        Joint institutional analysis: SpinQ NMR systems reach cost parity with cloud alternatives at month 14, saving 47% over 5 years. Power draw 2.1kW vs. 18kW for dilution fridges.
+      </div>
+      <div class="evidence-caveat">⚠ Methodology not independently peer-reviewed. Cited via SpinQ marketing materials.</div>
+    </div>
+  </div>
+
+  <div class="methods-critique reveal">
+    <h3>⚑ Methodological Questions an Investor Should Ask</h3>
+    <ul class="methods-list">
+      <li><strong>Sample sizes:</strong> None of the studies disclose n. A retention rate without knowing whether this covers 12 students or 1,200 is not interpretable.</li>
+      <li><strong>Random assignment:</strong> Were students randomly assigned to hardware vs. simulator conditions, or did hardware students self-select? Self-selection bias could explain all observed differences.</li>
+      <li><strong>Instructor equivalence:</strong> Were the same instructors teaching both conditions? Motivated instructors using new hardware may outperform any technology.</li>
+      <li><strong>Novelty effect:</strong> Short-term retention gains from novel hardware are well-documented in education research and typically fade within one semester. Were learning gains measured at 3 months? 6 months?</li>
+      <li><strong>Transfer:</strong> Did students who learned on NMR hardware perform better on Qiskit-based tasks or industry-standard assessments? This is the most investor-critical question.</li>
+      <li><strong>Independent replication:</strong> The EPJ Quantum Technology paper validates the hardware design — not learning outcomes. <span class="cite" data-source="SpinQ Gemini: A Desktop Quantum Computing Platform for Education and Research — EPJ Quantum Technology (2021)">EPJ</span> No independent pedagogical RCT has been published.</li>
+    </ul>
+  </div>
+
+  <div class="card reveal" style="margin-top:1rem; border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.05);">
+    <h3 style="color:var(--amber);">Honest Assessment</h3>
+    <p style="font-size:0.87rem; color:var(--offwhite); line-height:1.7;">
+      The directional case for physical hardware in quantum education is credible and consistent with broader hands-on learning research. 
+      But as currently documented, <strong style="color:var(--amber);">no vendor-independent evidence base exists for SpinQ's specific learning outcome claims.</strong>
+      A serious investor should require at minimum: disclosed sample sizes, a methodology document, and ideally one independent randomized study 
+      before treating the pedagogical argument as a confirmed investment thesis rather than a promising hypothesis.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ EXIT ═══════════════════════════════ -->
+<section id="exit">
+  <p class="section-eyebrow">07 · Exit Strategy</p>
+  <h2>How Do Investors Get Paid?</h2>
+  <p class="lead">SpinQ presents multiple credible exit paths — each with distinct timelines and risk profiles.</p>
+
+  <div class="exit-grid reveal">
+    <div class="exit-card">
+      <div class="exit-type">Exit Path 01</div>
+      <div class="exit-name">IPO — HK or Shenzhen Exchange</div>
+      <div class="exit-detail">Most likely near-term exit. SpinQ has secured Series C (~¥1B) and has stated IPO intent. HK listing would offer more Western investor liquidity than Shenzhen.</div>
+      <span class="exit-likelihood likely">Likely · 2–3 year horizon</span>
+    </div>
+    <div class="exit-card">
+      <div class="exit-type">Exit Path 02</div>
+      <div class="exit-name">Strategic Acquisition — Quantum Firm</div>
+      <div class="exit-detail">IBM, IonQ, or Quantinuum could acquire SpinQ's education vertical and hardware IP as a distribution channel. SpinQ's customer base of 200+ institutions is uniquely valuable to any quantum company seeking education market entry.</div>
+      <span class="exit-likelihood possible">Possible · Geopolitically complex</span>
+    </div>
+    <div class="exit-card">
+      <div class="exit-type">Exit Path 03</div>
+      <div class="exit-name">EdTech Platform Acquisition</div>
+      <div class="exit-detail">A major edtech company (Pearson, Coursera, 2U) seeking a hardware differentiator could acquire SpinQ's education product line. Less likely given hardware complexity but not implausible given curriculum integration.</div>
+      <span class="exit-likelihood speculative">Speculative · Long-horizon</span>
+    </div>
+    <div class="exit-card">
+      <div class="exit-type">Exit Path 04</div>
+      <div class="exit-name">Government / Sovereign Partnership</div>
+      <div class="exit-detail">National quantum programs (Singapore, UAE, Saudi Arabia, EU Quantum Flagship) may acquire or partner with SpinQ to build national quantum education infrastructure. Several active SpinQ deployments in these regions.</div>
+      <span class="exit-likelihood possible">Possible · Non-Western markets</span>
+    </div>
+  </div>
+
+  <div class="card reveal" style="margin-top:1rem; border-color:rgba(245,166,35,0.3);">
+    <h3 style="color:var(--gold);">Critical Exit Caveat for Western Investors</h3>
+    <p style="font-size:0.87rem; color:var(--offwhite); line-height:1.7;">
+      An IPO on the Shenzhen or Hong Kong exchange — the most probable exit — may limit liquidity and create currency risk for USD/EUR-denominated funds. 
+      A US NASDAQ or NYSE listing is <strong style="color:var(--amber);">highly unlikely given the current US-China regulatory environment</strong> around quantum technology. 
+      Western investors should model exit liquidity against HK market conditions and RMB conversion risk.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ RECOMMENDATION ═══════════════════════════════ -->
+<section id="recommendation">
+  <p class="section-eyebrow">08 · EVA Recommendation</p>
+
+  <div class="verdict-block reveal">
+    <div class="verdict-title">CONDITIONAL INVEST</div>
+    <p class="verdict-subtitle">
+      SpinQ has built something genuinely rare in edtech: a physical product solving a real problem,
+      with revenue, institutional customers, and a defensible first-mover position.
+    </p>
+
+    <div class="verdict-profile">
+      <strong>Recommended for:</strong> High-risk STEM innovation funds and university foundations with long investment horizons (5+ years), 
+      comfortable with pre-profitability deep tech and non-Western exchange liquidity.
+      Specifically well-suited for a <strong>mid-sized university foundation with $50–200K to deploy</strong> toward quantum literacy infrastructure — 
+      where physics and computer science departments are advocating for hands-on curriculum and the foundation's mandate includes STEM pipeline development.
+      <br><br>
+      <strong>Not suitable for:</strong> Conservative private equity investors, US-government-adjacent funds with China exposure limits, or any investor requiring profitability within 3 years.
+    </div>
+
+    <div class="invest-grid">
+      <div class="invest-col if">
+        <div class="ic-head">✓ Invest if</div>
+        <ul>
+          <li>Your fund is not US-government-adjacent or subject to China exposure restrictions</li>
+          <li>You can independently verify the learning outcome claims — demand disclosed sample sizes and an RCT</li>
+          <li>You are comfortable with pre-profitability deep tech on a 3–5 year IPO horizon (HK/Shenzhen)</li>
+          <li>You see the Global South / Asian university market as the primary growth opportunity</li>
+        </ul>
+      </div>
+      <div class="invest-col watch">
+        <div class="ic-head">◉ Watch carefully</div>
+        <ul>
+          <li>US export control evolution targeting educational quantum hardware</li>
+          <li>IBM free cloud access eroding SpinQ's cost-per-institution advantage</li>
+          <li>Whether SpinQ publishes independent pedagogical evidence</li>
+          <li>IPO timeline and exchange selection — this is your liquidity event</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bottom-line">
+      SpinQ is the most commercially mature quantum education company in the world. 
+      The geopolitical risk is real — price it in. Don't walk away because of it.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SOURCES ═══════════════════════════════ -->
+<section id="sources">
+  <p class="section-eyebrow">09 · References</p>
+  <h2>Sources &amp; References</h2>
+  <p style="font-size:0.8rem; color:var(--slate); margin-bottom:1rem;">Hover over <span class="cite" data-source="Citation tooltips appear throughout the analysis linking claims to sources">cite</span> markers throughout the analysis to see source attributions inline.</p>
+
+  <div class="sources-grid">
+    <div class="source-item"><span>SpinQ Technology</span> — Official site &amp; news: product specs, financial disclosures, case studies · <a href="https://www.spinquanta.com" target="_blank" rel="noopener">spinquanta.com</a></div>
+    <div class="source-item"><span>EPJ Quantum Technology (2021)</span> — SpinQ Gemini: A Desktop Quantum Computing Platform for Education and Research · <a href="https://doi.org/10.1140/epjqt/s40507-021-00113-y" target="_blank" rel="noopener">doi.org/10.1140/epjqt/s40507-021-00113-y</a></div>
+    <div class="source-item"><span>arXiv:2202.02983</span> — SpinQ Triangulum: A Commercial Three-Qubit Desktop Quantum Computer · <a href="https://arxiv.org/abs/2202.02983" target="_blank" rel="noopener">arxiv.org/abs/2202.02983</a></div>
+    <div class="source-item"><span>Yole Group (2023)</span> — SpinQ Gemini-Mini Technology Report</div>
+    <div class="source-item"><span>arXiv:2202.08940</span> — Defining the Quantum Workforce Landscape (QED-C) · <a href="https://arxiv.org/abs/2202.08940" target="_blank" rel="noopener">arxiv.org/abs/2202.08940</a></div>
+    <div class="source-item"><span>US-China ESRC (Nov. 2025)</span> — Vying for Quantum Supremacy · <a href="https://www.uscc.gov" target="_blank" rel="noopener">uscc.gov</a></div>
+    <div class="source-item"><span>Lawfare (Aug. 2024)</span> — Technology Controls to Contain China's Quantum Ambitions · <a href="https://www.lawfaremedia.org" target="_blank" rel="noopener">lawfaremedia.org</a></div>
+    <div class="source-item"><span>Quantum Zeitgeist (2026)</span> — China Quantum Computing Companies: Complete 2026 Guide · <a href="https://quantumzeitgeist.com" target="_blank" rel="noopener">quantumzeitgeist.com</a></div>
+    <div class="source-item"><span>The Quantum Insider (June 2026)</span> — Top Quantum Computing Investors in 2026 · <a href="https://thequantuminsider.com" target="_blank" rel="noopener">thequantuminsider.com</a></div>
+    <div class="source-item"><span>The Quantum Insider (May 2026)</span> — Chinese Quantum Companies: 10+ Leaders · <a href="https://thequantuminsider.com" target="_blank" rel="noopener">thequantuminsider.com</a></div>
+    <div class="source-item"><span>postquantum.com (April 2026)</span> — China's Quantum Supply Chain · <a href="https://postquantum.com" target="_blank" rel="noopener">postquantum.com</a></div>
+    <div class="source-item"><span>Tom's Hardware (Dec. 2022)</span> — SpinQ Introduces Trio of Portable Quantum Computers · <a href="https://www.tomshardware.com" target="_blank" rel="noopener">tomshardware.com</a></div>
+    <div class="source-item"><span>Vassar College / SpinQ (Aug. 2025)</span> — Gemini Lab deployment case study (vendor-published)</div>
+    <div class="source-item"><span>McKinsey</span> — Quantum Workforce Report · <a href="https://www.mckinsey.com" target="_blank" rel="noopener">mckinsey.com</a> · QED-C Quantum Market Report 2024</div>
+  </div>
+
+  <p class="source-caveat">
+    ⚠ Several key data points (revenue, deployment figures, retention rates, assessment scores, TCO analysis) are drawn from vendor-published or press sources. 
+    No independently audited financials are publicly available for SpinQ as a pre-IPO company. 
+    Independent academic verification of pedagogical claims is strongly recommended before any investment decision.
+  </p>
+</section>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer class="author-footer">
+  <div class="author-info">
+    <div class="author-name">Laila Kasim-Parkinson</div>
+    <div class="author-program">Master of Educational Technology · University of British Columbia</div>
+    <div class="author-course">Educational Venture Analysis · Learning Technologies Competitive Analysis</div>
+  </div>
+  <div class="verdict-final">
+    EVA Verdict: <strong style="color:var(--gold);">CONDITIONAL INVEST</strong><br>
+    Quantum Computing Education · SpinQ Technology · 2026
+  </div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const sections = document.querySelectorAll('section[id]');
+  const dots = document.querySelectorAll('.nav-dot');
+
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => revealObs.observe(r));
+
+  const lineObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.4 });
+  sections.forEach(s => lineObs.observe(s));
+
+  const navObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        dots.forEach(d => d.classList.remove('active'));
+        const a = document.querySelector(`.nav-dot[data-target="${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { threshold: 0.35 });
+  sections.forEach(s => navObs.observe(s));
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const t = document.getElementById(dot.dataset.target);
+      if (t) t.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
